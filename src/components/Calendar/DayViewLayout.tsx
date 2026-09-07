@@ -12,7 +12,6 @@ import { NoteLogView } from "../NoteLog/NoteLogView";
 import { TimeScrubber } from "../TimeScrubber";
 import { MonthGrid } from "./MonthGrid";
 import { useOverscrollNavigation } from "../../hooks/useOverscrollNavigation";
-import { useKeyboardInset } from "../../hooks/useKeyboardInset";
 import { getMonthName, isToday } from "../../utils/date";
 import { canEditNote } from "../../utils/noteRules";
 import { useNoteRepositoryContext } from "../../contexts/noteRepositoryContext";
@@ -78,7 +77,6 @@ export function DayViewLayout({
   noteError,
 }: DayViewLayoutProps) {
   const [editorPaneEl, setEditorPaneEl] = useState<HTMLDivElement | null>(null);
-  useKeyboardInset();
 
   // Today and read-only past days share the timeline. Past days that are
   // still editable (yesterday, backfill window) keep the free-form editor,
