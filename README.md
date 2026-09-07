@@ -12,7 +12,7 @@ A minimalist daily notes application designed to help you build and maintain a c
 ### 📝 **Minimalist Design for Consistency**
 
 - **One Note Per Day**: No complexity, no distractions—just write
-- **Read-Only Past**: Protect your streak by preventing edits to previous days
+- **Read-Only Past**: Protect your streak by locking days once they are more than a day old
 - **Future Dates Disabled**: Focus on today, not tomorrow
 - **Empty Note Auto-Delete**: If you write nothing, nothing is saved—keeping your calendar clean
 
@@ -169,7 +169,7 @@ This is a standard Vite + React app and can be deployed to:
 ### Viewing Past Notes
 
 1. Days with notes show a small dot indicator
-2. Click any past date to view its note (read-only)
+2. Click any past date to view its note (read-only, except yesterday)
 3. Future dates are not clickable
 
 ### Navigating Years
@@ -182,7 +182,7 @@ This is a standard Vite + React app and can be deployed to:
 ### Built for Consistency
 
 - **No Overwhelm**: One note per day means no decision fatigue
-- **Protected Past**: Can't edit yesterday's note, so you focus on today
+- **Protected Past**: Only today and yesterday are editable, so you focus on now
 - **Visual Progress**: See your writing streak grow throughout the year
 - **Frictionless**: Start writing in seconds, no setup required
 

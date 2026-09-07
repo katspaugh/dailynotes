@@ -5,6 +5,7 @@ import {
   parseDate,
   getTodayString,
   isToday,
+  isYesterday,
   isFuture,
   getDayCellState,
   formatDateDisplay,
@@ -22,32 +23,39 @@ describe("canEditNote", () => {
     expect(canEditNote(today)).toBe(true);
   });
 
-  it("returns false for yesterday at normal hours", () => {
+  it("returns true for yesterday at normal hours", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0)); // noon on June 15
-    const yesterday = new Date(2024, 5, 14);
-    expect(canEditNote(formatDate(yesterday))).toBe(false);
-  });
-
-  it("returns true for yesterday before 3am (late night)", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(2024, 5, 15, 2, 30, 0)); // 02:30 on June 15
     const yesterday = new Date(2024, 5, 14);
     expect(canEditNote(formatDate(yesterday))).toBe(true);
   });
 
-  it("returns false for yesterday at exactly 3am", () => {
+  it("returns true for yesterday late in the evening", () => {
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(2024, 5, 15, 3, 0, 0)); // 03:00 on June 15
+    vi.setSystemTime(new Date(2024, 5, 15, 23, 30, 0)); // 23:30 on June 15
     const yesterday = new Date(2024, 5, 14);
-    expect(canEditNote(formatDate(yesterday))).toBe(false);
+    expect(canEditNote(formatDate(yesterday))).toBe(true);
   });
 
-  it("returns false for two days ago even before 3am", () => {
+  it("returns true for yesterday even when it already has content", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0));
+    expect(canEditNote("14-06-2024", { noteIsEmpty: false })).toBe(true);
+  });
+
+  it("returns true for yesterday across a month boundary", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 6, 1, 12, 0, 0)); // July 1
+    expect(canEditNote("30-06-2024", { noteIsEmpty: false })).toBe(true);
+  });
+
+  it("returns false for two days ago when it has content", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2024, 5, 15, 2, 30, 0)); // 02:30 on June 15
     const twoDaysAgo = new Date(2024, 5, 13);
-    expect(canEditNote(formatDate(twoDaysAgo))).toBe(false);
+    expect(canEditNote(formatDate(twoDaysAgo), { noteIsEmpty: false })).toBe(
+      false,
+    );
   });
 
   it("returns false for tomorrow", () => {
@@ -198,6 +206,32 @@ describe("isToday", () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     expect(isToday(formatDate(tomorrow))).toBe(false);
+  });
+});
+
+describe("isYesterday", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("returns true for the day before today", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0)); // June 15
+    expect(isYesterday("14-06-2024")).toBe(true);
+  });
+
+  it("crosses month and year boundaries", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 0, 1, 12, 0, 0)); // Jan 1
+    expect(isYesterday("31-12-2023")).toBe(true);
+  });
+
+  it("returns false for today, two days ago, and invalid strings", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0));
+    expect(isYesterday("15-06-2024")).toBe(false);
+    expect(isYesterday("13-06-2024")).toBe(false);
+    expect(isYesterday("invalid")).toBe(false);
   });
 });
 

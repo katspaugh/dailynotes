@@ -7,7 +7,7 @@ It is derived from the current codebase with file references.
 
 - Minimal daily notes app: one note per day, year-at-a-glance calendar.
 - Local-first; optional cloud sync.
-- Notes encrypted client-side; past notes read-only; only today editable.
+- Notes encrypted client-side; past notes read-only; only today and yesterday editable.
 
 Refs: src/App.tsx, src/README.md, src/utils/noteRules.ts
 

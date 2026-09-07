@@ -81,8 +81,8 @@ export function DayViewLayout({
   useKeyboardInset();
 
   // Today and read-only past days share the timeline. Past days that are
-  // still editable (backfill window, late-night yesterday) keep the free-form
-  // editor, as do notes that need its status handling.
+  // still editable (yesterday, backfill window) keep the free-form editor,
+  // as do notes that need its status handling.
   const { emptyNoteDate } = useNoteRepositoryContext();
   const selectedIsToday = selectedDate ? isToday(selectedDate) : false;
   const selectedCanEdit = selectedDate

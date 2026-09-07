@@ -1,9 +1,6 @@
-import { formatDate, isToday, parseDate } from "./date";
+import { isToday, isYesterday, parseDate } from "./date";
 
 const ALLOW_PAST_EDIT_KEY = "dailynote_allow_past_edit";
-
-// Notes are editable until this hour (exclusive) of next day
-const LATE_NIGHT_EDIT_UNTIL_HOUR = 3;
 
 export function isPastEditAllowed(): boolean {
   if (typeof window === "undefined") return false;
@@ -44,14 +41,9 @@ export function canEditNote(
   if (isPastEditAllowed()) {
     return true;
   }
-  if (isToday(dateStr)) {
+  // Today and yesterday stay open, so a day can be finished the morning after
+  if (isToday(dateStr) || isYesterday(dateStr)) {
     return true;
-  }
-  // Allow editing yesterday's note during late night (before 3am)
-  if (new Date().getHours() < LATE_NIGHT_EDIT_UNTIL_HOUR) {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    if (dateStr === formatDate(yesterday)) return true;
   }
   // Skipped days: notes without content can still be written for a while
   if (options?.noteIsEmpty && isWithinBackfillWindow(dateStr)) {

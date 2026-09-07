@@ -1,6 +1,6 @@
 # Ichinichi
 
-Minimalist daily notes app. Year-at-a-glance calendar. Local-first, optional cloud sync. Client-side encryption, IndexedDB. Today editable, past read-only, future disabled.
+Minimalist daily notes app. Year-at-a-glance calendar. Local-first, optional cloud sync. Client-side encryption, IndexedDB. Today and yesterday editable, older days read-only, future disabled.
 
 ## Core Rules
 

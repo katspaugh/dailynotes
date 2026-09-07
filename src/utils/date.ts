@@ -146,6 +146,15 @@ export function isToday(dateStr: string): boolean {
 }
 
 /**
+ * Check if a date string represents yesterday
+ */
+export function isYesterday(dateStr: string): boolean {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return dateStr === formatDate(yesterday);
+}
+
+/**
  * Check if a date string represents a future date
  */
 export function isFuture(dateStr: string): boolean {
