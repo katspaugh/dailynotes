@@ -36,7 +36,7 @@ interface NoteLogViewProps {
   onChange: (content: string) => void;
   isContentReady: boolean;
   isDecrypting?: boolean;
-  /** Past days: show the timeline without the composer or editing. */
+  /** Older days: show the timeline without the composer or editing. */
   readOnly?: boolean;
 }
 
@@ -419,9 +419,9 @@ export function NoteLogView({
   );
 
   // Photos shared to the app via the Web Share Target API land on today's
-  // note, which is this view.
+  // note only, never on yesterday's.
   useShareTarget(
-    onImageDrop ? handleImageFile : undefined,
+    onImageDrop && isToday(date) ? handleImageFile : undefined,
     isContentReady && !isDecrypting,
   );
 

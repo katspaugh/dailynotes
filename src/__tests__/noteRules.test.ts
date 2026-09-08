@@ -1,5 +1,9 @@
 import { vi, describe, it, expect, afterEach } from "vitest";
-import { canEditNote, isWithinBackfillWindow } from "../utils/noteRules";
+import {
+  canEditNote,
+  isWithinBackfillWindow,
+  usesTimelineView,
+} from "../utils/noteRules";
 import {
   formatDate,
   parseDate,
@@ -320,5 +324,50 @@ describe("round-trip formatting", () => {
     expect(parsed!.getDate()).toBe(original.getDate());
     expect(parsed!.getMonth()).toBe(original.getMonth());
     expect(parsed!.getFullYear()).toBe(original.getFullYear());
+  });
+});
+
+describe("usesTimelineView", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows the timeline for today", () => {
+    expect(usesTimelineView(getTodayString(), {})).toBe(true);
+  });
+
+  it("shows the timeline for yesterday, which is still editable", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0));
+    expect(usesTimelineView("14-06-2024", { noteIsEmpty: false })).toBe(true);
+    expect(usesTimelineView("14-06-2024", { noteIsEmpty: true })).toBe(true);
+  });
+
+  it("shows the timeline for read-only older days", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0));
+    expect(usesTimelineView("13-06-2024", { noteIsEmpty: false })).toBe(true);
+  });
+
+  it("keeps the free-form editor for backfillable empty older days", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0));
+    expect(usesTimelineView("13-06-2024", { noteIsEmpty: true })).toBe(false);
+  });
+
+  it("keeps the free-form editor for notes that need status handling", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 5, 15, 12, 0, 0));
+    expect(usesTimelineView("14-06-2024", { isSoftDeleted: true })).toBe(false);
+    expect(usesTimelineView("15-06-2024", { isSoftDeleted: true })).toBe(false);
+    expect(
+      usesTimelineView("13-06-2024", {
+        noteIsEmpty: false,
+        isOfflineStub: true,
+      }),
+    ).toBe(false);
+    expect(
+      usesTimelineView("13-06-2024", { noteIsEmpty: false, hasError: true }),
+    ).toBe(false);
   });
 });

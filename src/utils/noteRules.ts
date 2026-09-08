@@ -51,3 +51,28 @@ export function canEditNote(
   }
   return false;
 }
+
+export interface TimelineViewOptions extends CanEditNoteOptions {
+  // The note is in the trash; the free-form editor shows the restore prompt
+  isSoftDeleted?: boolean;
+  // The note is known to exist remotely but its content is not cached
+  isOfflineStub?: boolean;
+  // Loading or decrypting the note failed
+  hasError?: boolean;
+}
+
+/**
+ * Today and yesterday (both editable) get the timeline with its composer.
+ * Older days get the timeline read-only, unless they are still editable
+ * (backfill window, past-edit override) or need the free-form editor's
+ * status handling.
+ */
+export function usesTimelineView(
+  dateStr: string,
+  options: TimelineViewOptions,
+): boolean {
+  if (options.isSoftDeleted) return false;
+  if (isToday(dateStr) || isYesterday(dateStr)) return true;
+  if (options.isOfflineStub || options.hasError) return false;
+  return !canEditNote(dateStr, { noteIsEmpty: options.noteIsEmpty });
+}

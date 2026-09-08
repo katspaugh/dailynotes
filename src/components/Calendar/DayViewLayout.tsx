@@ -12,8 +12,8 @@ import { NoteLogView } from "../NoteLog/NoteLogView";
 import { TimeScrubber } from "../TimeScrubber";
 import { MonthGrid } from "./MonthGrid";
 import { useOverscrollNavigation } from "../../hooks/useOverscrollNavigation";
-import { getMonthName, isToday } from "../../utils/date";
-import { canEditNote } from "../../utils/noteRules";
+import { getMonthName } from "../../utils/date";
+import { canEditNote, usesTimelineView } from "../../utils/noteRules";
 import { useNoteRepositoryContext } from "../../contexts/noteRepositoryContext";
 import type { HabitMark } from "../../utils/habits";
 
@@ -78,18 +78,22 @@ export function DayViewLayout({
 }: DayViewLayoutProps) {
   const [editorPaneEl, setEditorPaneEl] = useState<HTMLDivElement | null>(null);
 
-  // Today and read-only past days share the timeline. Past days that are
-  // still editable (yesterday, backfill window) keep the free-form editor,
-  // as do notes that need its status handling.
+  // Today, yesterday and read-only past days share the timeline. Older days
+  // that are still editable (backfill window) keep the free-form editor, as
+  // do notes that need its status handling.
   const { emptyNoteDate } = useNoteRepositoryContext();
-  const selectedIsToday = selectedDate ? isToday(selectedDate) : false;
+  const noteIsEmpty = emptyNoteDate === selectedDate;
   const selectedCanEdit = selectedDate
-    ? canEditNote(selectedDate, { noteIsEmpty: emptyNoteDate === selectedDate })
+    ? canEditNote(selectedDate, { noteIsEmpty })
     : false;
   const showTimeline =
     !!selectedDate &&
-    !isSoftDeleted &&
-    (selectedIsToday || (!selectedCanEdit && !isOfflineStub && !noteError));
+    usesTimelineView(selectedDate, {
+      noteIsEmpty,
+      isSoftDeleted,
+      isOfflineStub,
+      hasError: !!noteError,
+    });
 
   useOverscrollNavigation(editorPaneEl, {
     onOverscrollUp: canNavigatePrev ? onNavigatePrev : undefined,
@@ -202,7 +206,7 @@ export function DayViewLayout({
                 onChange={onChange}
                 isContentReady={isContentReady}
                 isDecrypting={isDecrypting}
-                readOnly={!selectedIsToday}
+                readOnly={!selectedCanEdit}
               />
             ) : (
               <NoteEditor
